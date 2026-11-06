@@ -1,0 +1,30 @@
+name: cloudmaker-extra
+services:
+  app:
+    build: .
+    init: true
+    environment:
+      CLOUDMAKER_STORAGE: ${STORAGE_DIR:-/var/lib/libvirt/images/cloudmaker}
+      CLOUDMAKER_ACCEL: ${CLOUDMAKER_ACCEL:-kvm}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    volumes:
+      - /run/libvirt:/run/libvirt
+      - ${STORAGE_DIR:-/var/lib/libvirt/images/cloudmaker}:${STORAGE_DIR:-/var/lib/libvirt/images/cloudmaker}
+      - state:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/vms', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    stop_grace_period: 30s
+  prometheus:
+    image: prom/prometheus:v3.13.5
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - metrics:/prometheus
+volumes:
+  state:
+  metrics:

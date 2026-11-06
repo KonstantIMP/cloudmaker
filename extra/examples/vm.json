@@ -1,0 +1,7 @@
+{
+  "image_id": "REPLACE_WITH_IMAGE_ID",
+  "name": "demo",
+  "hostname": "demo",
+  "ssh_keys": [],
+  "user_data": "#cloud-config\nusers:\n  - default\n  - name: cloudmaker\n    lock_passwd: false\n    plain_text_passwd: cloudmaker\nruncmd:\n  - [sh, -c, 'echo ready > /home/cloudmaker/ready']\n"
+}
